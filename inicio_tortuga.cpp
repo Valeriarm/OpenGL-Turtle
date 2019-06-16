@@ -20,21 +20,58 @@
 
 using namespace std;
 bool flagAxis = false;
+bool flagTurtle = true;
 GLfloat X=0, Y=1.0 ,Z=3.0;
 
 void drawTurtle(void){
-    double x[]={0.0,-0.1,-0.3,-0.1,-0.1,-0.4,-0.45,-0.5,-0.55,-0.6,-045},
-           z[]={0.0,-0.1,-0.3,-0.3,-0.45,-0.45,-0.4,-0.38,-0.4,-0.5,-0.5};
+    double x[]={0.0,0.1,0.2,0.2,0.1,0.1,0.2,0.2,0.3 ,0.4,0.4,0.3,0.4,0.4,0.3,0.4,0.4,0.3 ,0.2,0.1,0.0 },
+           z[]={0.0,0.0,0.1,0.2,0.3,0.4,0.4,0.3,0.25,0.3,0.4,0.5,0.7,0.9,1.1,1.2,1.3,1.35,1.3,1.2,1.16};
     glColor3f(1.0,0.0,0.0);
 
     glBegin(GL_LINE_LOOP);
-    for(int i=0; i<11;i++){
+    for(int i=0; i<21;i++){
         glVertex3f(x[i],0.0,z[i]);
     }
-    for(int i=10; i>=0;i--){
+    for(int i=20; i>=0;i--){
         glVertex3f(x[i]*-1,0.0,z[i]);
     }
     glEnd();
+}
+
+void drawSphereTurtle(void){
+    int slices = 40;
+    int stacks = 40;
+
+    glPushMatrix();
+    glScalef(1.0f, .3f, 1.0f);
+    glutWireSphere(1.0, slices, stacks);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(.7f, 0.0f, .7f);
+    glutWireSphere(.3, slices, stacks);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-.7f, 0.0f, .7f);
+    glutWireSphere(.3, slices, stacks);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(.7f, 0.0f, -.7f);
+    glutWireSphere(.3, slices, stacks);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-.7f, 0.0f, -.7f);
+    glutWireSphere(.3, slices, stacks);
+    glPopMatrix();
+
+    glPushMatrix();
+    glScalef(1.0f, .6f, 1.0f);
+    glTranslatef(0.0f, 0.0f, -1.2f);
+    glutWireSphere(.4, slices, stacks);
+    glPopMatrix();
 }
 
 void axis(void){
@@ -68,10 +105,15 @@ void display(void) {
     //glutWireTorus(0.25,0.75, 28, 28);
     //glColor3f(0.0,0.0,1.0) ;
     //glutWireCube(.60) ;
-    drawTurtle();
+    if(flagTurtle){
+        drawTurtle();
+    }else{
+        drawSphereTurtle();
+    }
     if (flagAxis){
         axis();
     }
+    glTranslatef(0.0,0.0,0.0);
     glutSwapBuffers();
 }
 
@@ -92,6 +134,9 @@ void keyboard(unsigned char key, int x, int y) {
         printf("help\n\n");
         printf("c - Toggle culling\n");
         printf("a - Axis\n");
+        printf("1 - rotate y\n");
+        printf("2 - rotate x\n");
+        printf("z - 3D Turtle\n");
         printf("q/escape - Quit\n\n");
         break;
     case 'c':
@@ -132,6 +177,9 @@ void keyboard(unsigned char key, int x, int y) {
     case 'q':
     case 27:
         exit(0);
+        break;
+    case 'z':
+        flagTurtle=!flagTurtle;
         break;
     }
     glutPostRedisplay();
