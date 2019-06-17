@@ -5,10 +5,10 @@
  */
 
 /* 
- * File:   main.cpp
- * Author: javargas
- *
- * Created on February 12, 2017, 11:49 AM
+ * Integrantes:
+ * Valeria Rivera Muñoz, 1626837
+ * Juan Felipe Gil Londoño, 1626055
+ * Mateo Gregory Jimenez, 1629431
  */
 
 #include <stdio.h>
@@ -21,7 +21,7 @@
 using namespace std;
 bool flagAxis = false;
 bool flagTurtle = true;
-GLfloat X=0, Y=1.0 ,Z=3.0;
+GLfloat X=0.0, Y=1.0 ,Z=3.0;
 
 void drawTurtle(void){
     double x[]={0.0,0.1,0.2,0.2,0.1,0.1,0.2,0.2,0.3 ,0.4,0.4,0.3,0.4,0.4,0.3,0.4,0.4,0.3 ,0.2,0.1,0.0 },
@@ -128,56 +128,70 @@ void reshape(int width, int height) {
 }
 
 void keyboard(unsigned char key, int x, int y) {
-    cout << "I am a key:" << key << '\n';
     switch (key) {
     case 'h':
+    case 'H':
         printf("help\n\n");
-        printf("c - Toggle culling\n");
         printf("a - Axis\n");
         printf("1 - rotate y\n");
         printf("2 - rotate x\n");
-        printf("z - 3D Turtle\n");
+        printf("3 - rotate z\n");
+        printf("z - 2D/3D Turtle\n");
+        printf("u - Move camera up\n");
+        printf("d - Move camera down\n");
+        printf("l - Move camera left\n");
+        printf("r - Move camera right\n");
         printf("q/escape - Quit\n\n");
         break;
     case 'c':
+    case 'C':
         if (glIsEnabled(GL_CULL_FACE))
            glDisable(GL_CULL_FACE);
         else
             glEnable(GL_CULL_FACE);
         break;
     case '1':
-        glRotatef(1.0,1.,0.,0.);
+        glRotatef(1.0,1.0,0.0,0.0);
         break;
     case '2':
-        glRotatef(1.0,0.,1.,0.);
+        glRotatef(1.0,0.0,1.0,0.0);
+        break;
+    case '3':
+        glRotatef(1.0,0.0,0.0,1.0);
         break;
     case 'a':
+    case 'A':
         flagAxis=!flagAxis;
         break;	
     case 'u':
-        Y += 0.1f;
-        glLoadIdentity();
-        gluLookAt(X,Y,Z,0.0,0.0,0.0,0.0,1.0,0.0);
-        break;
-    case 'd':
+    case 'U':
         Y -= 0.1f;
         glLoadIdentity();
-        gluLookAt(X,Y,Z,0.0,0.0,0.0,0.0,1.0,0.0);
+        gluLookAt(X,Y,Z,X,Y,0.0,0.0,1.0,0.0);
+        break;
+    case 'd':
+    case 'D':
+        Y += 0.1f;
+        glLoadIdentity();
+        gluLookAt(X,Y,Z,X,Y,0.0,0.0,1.0,0.0);
         break;
     case 'l':
-        X -= 0.1f;
-        glLoadIdentity();
-        gluLookAt(X,Y,Z,0.0,0.0,0.0,0.0,1.0,0.0);
-        break;
-    case 'r':
+    case 'L':
         X += 0.1f;
         glLoadIdentity();
-        gluLookAt(X,Y,Z,0.0,0.0,0.0,0.0,1.0,0.0);
+        gluLookAt(X,Y,Z,X,Y,0.0,0.0,1.0,0.0);
         break;
+    case 'r':
+    case 'R':
+        X -= 0.1f;
+        glLoadIdentity();
+        gluLookAt(X,Y,Z,X,Y,0.0,0.0,1.0,0.0);
+        break;
+    case 'Q':
     case 'q':
-    case 27:
         exit(0);
         break;
+    case 'Z':
     case 'z':
         flagTurtle=!flagTurtle;
         break;
