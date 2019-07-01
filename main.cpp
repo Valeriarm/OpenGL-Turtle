@@ -14,6 +14,7 @@ char strCommand[256];
 static Camara *MiCamara;
 static int spot_move = 0;
 static int old_x, old_y;
+bool showTurtle = true;
 bool flagAxis = false;
 bool flagTurtle = true;
 
@@ -51,9 +52,11 @@ void display(void) {
     
     MiCamara->SetGLCamera();
     
-    glPushMatrix();
-    drawSphereTurtle();
-    glPopMatrix();
+    if(showTurtle){
+        glPushMatrix();
+        drawSphereTurtle();
+        glPopMatrix();
+    }
     
     if(flagAxis){
         DrawAxis();
@@ -113,12 +116,16 @@ void parseCommand(char* strCommandParse) {
             glRotatef(val, 1., 0., 0.);
         } else if (!strcmp("lr", strToken0)) { // DOWN
             glRotatef(-val, 0., 0., 1.);
-        } else if (!strcmp("scalex", strToken0)) { // DOWN
-            glRotatef(-val, 0., 0., 1.);
-        } else if (!strcmp("scaley", strToken0)) { // UP
-            glRotatef(val, 1., 0., 0.);
-        } else if (!strcmp("scalez", strToken0)) { // DOWN
-            glRotatef(-val, 0., 0., 1.);
+        } else if (!strcmp("sx", strToken0)) { // DOWN
+            glScalef(val, 1., 1.);
+        } else if (!strcmp("sy", strToken0)) { // UP
+            glScalef(1., val, 1.);
+        } else if (!strcmp("sz", strToken0)) { // DOWN
+            glScalef(1., 1., val);
+        } else if (!strcmp("ht", strToken0)) { // UP
+            showTurtle = false;
+        } else if (!strcmp("st", strToken0)) { // DOWN
+            showTurtle = true;
         } else {
             break;
         }
@@ -135,8 +142,14 @@ void parseCommand(char* strCommandParse) {
 }
 
 void reshape(int width, int height) {
-    glViewport(0, 0, width, height);
-    MiCamara->SetGLAspectRatioCamera();
+    int dim = (width < height) ? width : height;
+    glViewport(0, 0, dim, dim);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(60.0, (GLfloat) dim / (GLfloat) dim, 1.0, 128.0);
+    glMatrixMode(GL_MODELVIEW);
+
+    glLoadIdentity();
 }
 
 void MouseMotion(int x, int y) {
@@ -302,6 +315,17 @@ void keyboard(unsigned char key, int x, int y) {
             case '2':
                 glRotatef(1.0, 0., 1., 0.);
                 break;
+            case '3':
+                glRotatef(1.0, 0., 0., 1.);
+            case '4':
+                glRotatef(1.0, -1., 0., 0.);
+                break;
+            case '5':
+                glRotatef(1.0, 0., -1., 0.);
+                break;
+            case '6':
+                glRotatef(1.0, 0., 0., -1.);
+                break;
             case 'I':
             case 'i':
                 command = true;
@@ -386,7 +410,7 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
 
     // Colocamos la cámara en (0,1,-3) mirando hacia (0,0,0)
-    MiCamara = new Camara(0.0f, 1.0f, -3.0f);
+    MiCamara = new Camara(0, 1, -3);
 
     glutInitDisplayMode(GLUT_RGB | GLUT_DEPTH | GLUT_DOUBLE);
     glutInitWindowSize(512, 512);
