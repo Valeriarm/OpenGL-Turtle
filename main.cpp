@@ -1,12 +1,21 @@
 //#include <stdarg.h>
+#include<GL/freeglut.h>
 #include <GL/glut.h>
+#include<fstream>
+
+#include <iostream>
+#include <fstream>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 #include "Camara.h"
 #include "primitivas.h"
 #include "Vector_tools.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
+#define PI 3,14159265358979323846
+
+using namespace std;
 
 bool command = false; /* command mode */
 char strCommand[256];
@@ -17,6 +26,8 @@ static int old_x, old_y;
 bool showTurtle = true;
 bool flagAxis = false;
 bool flagTurtle = true;
+int giroCompleto;
+ifstream fe;
 
 void axis(void){
     
@@ -66,6 +77,22 @@ void display(void) {
     glutSwapBuffers();
 }
 
+float ConversorAngulo(float angulo) {
+    switch (giroCompleto) {
+        case 400:
+            return (angulo * 360) / 400;
+        case 12:
+        case 60:
+            return (angulo * 360) / 60;
+        case 2:
+            return (angulo * 180);
+    }
+}   
+
+void load(char* archivo) {
+    fe.open(archivo);
+}
+
 char * insideRepeat(char* strCommandInside) {
     char *ini, *fin;
     ini = strchr(strCommandInside,'[');
@@ -99,45 +126,66 @@ void parseCommand(char* strCommandParse) {
             strToken0 = strtok(nextCommand, " ");
         if (strToken0 == NULL) continue;
         continue;
-        }
-        if (!strcmp("fd", strToken0)) { // FORWARD
-            glTranslatef(0.0, 0.0, val);
-        } else if (!strcmp("bk", strToken0)) { // BACK
-            glTranslatef(0.0, 0.0, -val);
-        } else if (!strcmp("rt", strToken0)) { // RIGHT
-            glRotatef(-val, 0., 1., 0.);
-        } else if (!strcmp("lt", strToken0)) { // LEFT
-            glRotatef(val, 0., 1., 0.);
-        } else if (!strcmp("up", strToken0)) { // UP
-            glRotatef(val, 1., 0., 0.);
-        } else if (!strcmp("dn", strToken0)) { // DOWN
-            glRotatef(-val, 0., 0., 1.);
-        } else if (!strcmp("rr", strToken0)) { // UP
-            glRotatef(val, 1., 0., 0.);
-        } else if (!strcmp("lr", strToken0)) { // DOWN
-            glRotatef(-val, 0., 0., 1.);
-        } else if (!strcmp("sx", strToken0)) { // DOWN
-            glScalef(val, 1., 1.);
-        } else if (!strcmp("sy", strToken0)) { // UP
-            glScalef(1., val, 1.);
-        } else if (!strcmp("sz", strToken0)) { // DOWN
-            glScalef(1., 1., val);
-        } else if (!strcmp("ht", strToken0)) { // UP
-            showTurtle = false;
-        } else if (!strcmp("st", strToken0)) { // DOWN
-            showTurtle = true;
+        } 
+        if (!strcmp("load", strToken0)) {
+            printf("-----CARGO----");
+
+            load(strToken1);
+            while (!fe.eof()) {
+                fe.getline(strCommand, 128);
+                strcat(strCommand, " ");
+                parseCommand(strCommand);
+                strcpy(strCommand, "");
+
+            }
+            fe.close();
         } else {
-            break;
-        }
+            val = atof(strToken1);
+            if (!strcmp("sc", strToken0)) { // DOWN
+                if (strToken1 == "2pi" || strToken1 == "2PI") {
+                    giroCompleto = 2;
+                } else {
+                    giroCompleto = val;
+                }
+            } else if (!strcmp("fd", strToken0)) { // FORWARD
+                glTranslatef(0.0, 0.0, val);
+            } else if (!strcmp("bk", strToken0)) { // BACK
+                glTranslatef(0.0, 0.0, -val);
+            } else if (!strcmp("rt", strToken0)) { // RIGHT
+                glRotatef(-val, 0., 1., 0.);
+            } else if (!strcmp("lt", strToken0)) { // LEFT
+                glRotatef(val, 0., 1., 0.);
+            } else if (!strcmp("up", strToken0)) { // UP
+                glRotatef(val, 1., 0., 0.);
+            } else if (!strcmp("dn", strToken0)) { // DOWN
+                glRotatef(-val, 0., 0., 1.);
+            } else if (!strcmp("rr", strToken0)) { // UP
+                glRotatef(val, 1., 0., 0.);
+            } else if (!strcmp("lr", strToken0)) { // DOWN
+                glRotatef(-val, 0., 0., 1.);
+            } else if (!strcmp("sx", strToken0)) { // DOWN
+                glScalef(val, 1., 1.);
+            } else if (!strcmp("sy", strToken0)) { // UP
+                glScalef(1., val, 1.);
+            } else if (!strcmp("sz", strToken0)) { // DOWN
+                glScalef(1., 1., val);
+            } else if (!strcmp("ht", strToken0)) { // UP
+                showTurtle = false;
+            } else if (!strcmp("st", strToken0)) { // DOWN
+                showTurtle = true;
+            } else {
+                break;
+            }
         strToken0 = strtok(NULL, " ");
         display();
-    }
-    // EXIT COMMAND MODE
-    if (strToken0 != NULL && strncmp(strToken0, "exit", 4) == 0) {
-        command = false;
-        // HOME
-    } else if (strToken0 != NULL && !strcmp("home", strToken0)) {
-        glLoadIdentity();
+        }
+        // EXIT COMMAND MODE
+        if (strToken0 != NULL && strncmp(strToken0, "exit", 4) == 0) {
+            command = false;
+            // HOME
+        } else if (strToken0 != NULL && !strcmp("home", strToken0)) {
+            glLoadIdentity();
+        }
     }
 }
 
